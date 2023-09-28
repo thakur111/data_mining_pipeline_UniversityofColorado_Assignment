@@ -1,0 +1,277 @@
+#PROBLEM 1
+
+import pandas as pd
+import numpy as np
+import pickle
+from pathlib import Path
+import math
+
+
+
+def normalization (fname, attr, normType):
+    '''
+    Input Parameters:
+        fname: Name of the csv file contiaining historical quotes
+        attr: The attribute to be normalized 
+        normType: The type of normalization 
+    Output:
+        a dictionary where each key is the original column value and each value is the normalised column value. 
+    '''
+    result = {
+        
+    }
+    
+    # your code here
+    df = pd.read_csv(fname)
+    
+    # Extract the specified attribute column
+    col = df.iloc[:, attr]
+    
+    if normType == 'min_max':
+        # Min-Max normalization
+        min_val = col.min()
+        max_val = col.max()
+        range_val = max_val - min_val
+        
+        for val in col:
+            normalized_val = (val - min_val) / range_val
+            result[val] = normalized_val
+    elif normType == 'z_score':
+        # Z-score normalization
+        mean_val = col.mean()
+        std_val = col.std()
+        
+        for val in col:
+            normalized_val = (val - mean_val) / std_val
+            result[val] = normalized_val
+    
+    return result
+
+
+
+def correlation (fname1, attr1, fname2, attr2):
+    '''
+    Input Parameters:
+        fname1: name of the first csv file containing historical quotes
+        attr1: The attribute to consider in the first csv file (fname1)
+        fname2: name of the second csv file containing historical quotes
+        attr2: The attribute to consider in the second csv file (fname2)
+        
+    Output:
+        correlation coefficient between attr1 in fname1 and attr2 in fname2
+    '''
+    
+    correlation_coefficient = 0.0
+        
+    
+    #TODO: Write code given the Input / Output Paramters.
+    
+    # your code here
+    df1 = pd.read_csv(fname1)
+    df2 = pd.read_csv(fname2)
+    
+    # Extract the specified attribute columns
+    col1 = df1.iloc[:, attr1]
+    col2 = df2.iloc[:, attr2]
+    
+    # Calculate the correlation coefficient
+    correlation_coefficient = col1.corr(col2)
+    
+    return correlation_coefficient
+
+
+import unittest
+
+class TestKnn(unittest.TestCase):
+    def setUp(self):
+        self.loc1 = "data/test1.csv"
+        self.loc2 = "data/test2.csv"
+        file = open('data/testing_normalization', 'rb')
+        self.data_normalization = pickle.load(file)
+        file.close()
+        file = open('data/testing_correlation', 'rb')
+        self.data_correlation = pickle.load(file)
+        file.close()
+        file = open('data/testing_zscore', 'rb')
+        self.zscore = pickle.load(file)
+        
+    def test0(self):
+        """
+        Test min_max normalization 
+        """
+        result = normalization("./data/normalization_test_data.csv", 0, "min_max")
+        for key,value in self.data_normalization.items():
+            self.assertAlmostEqual(result[key],value, places = 1)
+            
+    
+    def test1(self):
+        """
+        Test zcore normalization
+        """
+        result = normalization("./data/normalization_test_data.csv", 1, "z_score")
+        for key, value in self.zscore.items():
+            self.assertAlmostEqual(result[key], value, places = 1)
+    
+    def test2(self):
+        """
+        Test correlation 
+        """
+        result = correlation('./data/correlation_test_data.csv', 0, "./data/correlation_test_data.csv", 0)
+        self.assertAlmostEqual(result,self.data_correlation, places = 1)
+       
+   
+tests = TestKnn()
+tests_to_run = unittest.TestLoader().loadTestsFromModule(tests)
+unittest.TextTestRunner().run(tests_to_run)
+
+
+
+
+
+
+
+
+
+
+#PROBLEM 2 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import matplotlib
+# Plot size to 14" x 7"
+matplotlib.rc('figure', figsize = (14, 7))
+# Font size to 14
+matplotlib.rc('font', size = 14)
+# Do not display top and right frame lines
+matplotlib.rc('axes.spines', top = False, right = False)
+# Remove grid lines
+matplotlib.rc('axes', grid = False)
+# Set backgound color to white
+matplotlib.rc('axes', facecolor = 'white')
+
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def temporal_graph():
+    '''Input : No input parameters required.
+    
+    Output : 
+    Plot the temporal change of attributes High and Low values.
+    Return a temporal graph with attributes Date on the x-axis and a tuple of High and Low on the y-axis displayed.
+    '''
+    
+    # Read the dataset
+    df = pd.read_csv('./data/HistoricalQuotes.csv')
+    
+    # Extract data
+    dates = df['Date'].tolist()
+    high_values = df['High'].tolist()
+    low_values = df['Low'].tolist()
+    
+    # Create the plot
+    plt.figure(figsize=(14, 7))
+    plt.plot(dates, high_values, label='High')
+    plt.plot(dates, low_values, label='Low')
+    
+    # Set labels and title
+    plt.xlabel('Date')
+    plt.ylabel('High and Low Values')
+    plt.title('Temporal Change of High and Low Values')
+    
+    # Add legend
+    plt.legend()
+    
+    # Show the plot
+    plt.grid(True)
+    plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+    plt.show()
+    
+    # Return the required values as specified in the instructions
+    return dates, (high_values, low_values), 'Date', 'High and Low Values', 'Temporal Change of High and Low Values'
+
+# Call the function to plot the temporal graph
+temporal_graph()
+
+
+
+#boxplot
+
+
+def boxplot():
+    '''Input : x_data and y_data are the lists containing the data points for x and y axis
+    base_color and median_color can be used to set colors in the graph.
+    xlabel and ylabel are the labels that should be given to the corresponding axes
+    title contains the title of the graph.
+    
+    Output : A boxplot with Open and Close attributes on the x-axis displayed
+    
+    x_data - a tuple of Open and Close values respectively. Open and Close should be stored as a python list.
+             Ex: x_data = (list(df['attr_1']), list(df['attr_2']))
+    xlabel, ylabel - A string value representing the axes labels
+    title - A string representing the title for the graph
+    '''
+    
+    df = pd.read_csv('./data/HistoricalQuotes.csv')
+    
+        
+    # your code here
+    open_data = df['Open']
+    close_data = df['Close']
+    
+    # Create the boxplot
+    plt.figure(figsize=(14, 7))
+    plt.boxplot([open_data, close_data], labels=['Open', 'Close'], patch_artist=True, medianprops={'color':'black'})
+    
+    # Set labels and title
+    plt.xlabel('Attribute')
+    plt.ylabel('Values')
+    plt.title('Boxplot of Open and Close Attributes')
+    
+    # Customize box colors
+    box_colors = ['lightblue', 'lightgreen']
+    for patch, color in zip(plt.gca()['boxes'], box_colors):
+        patch.set_facecolor(color)
+    
+    # Show the plot
+    plt.grid(True)
+    plt.show()
+
+    return x_data,xlabel,ylabel,title
+
+
+
+def histogram():
+    '''Input : data is the list containing the data points for histogram buckets
+    xlabel and ylabel are the labels that should be given to the corresponding axes
+    title contains the title of the graph
+    
+    Output : A histogram of the Volume attribute displayed
+    
+    data - A python list containing the data associated with the Volume attribute
+    x_label, y_label - A string representing the axes labels 
+    '''
+
+    df = pd.read_csv('./data/HistoricalQuotes.csv')
+
+    data = []
+    
+    # your code here
+    x_label = 'Volume'
+    y_label = 'Count'
+    data = list(df['Volume'])
+
+    return data, x_label, y_label
+ 
