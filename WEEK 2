@@ -1,0 +1,121 @@
+#PROBLEM 1
+
+
+
+import argparse
+import pandas as pd
+import numpy as np
+import pickle
+from pathlib import Path
+
+
+
+def calculate(dataFile, col_num):
+    """
+    Input Parameters:
+        dataFile: The dataset file.
+        ithAttre: The ith attribute for which the various properties must be calculated.
+
+    Default value of 0,infinity,-infinity are assigned to all the variables as required. 
+    """
+    numObj, minValue, maxValue, mean, stdev, Q1, median, Q3, IQR = [0,"inf","-inf",0,0,0,0,0,0]
+    #YOUR TASK: Write code to assign the values to the respective variables.
+
+    dataset = pd.read_csv(dataFile)
+
+    # Select the specified column
+    col = dataset.iloc[:, col_num]
+
+    # Calculate the requested statistics
+    numObj = len(col)
+    minValue = col.min()
+    maxValue = col.max()
+    mean = col.mean()
+    stdev = col.std()
+    Q1 = col.quantile(0.25)
+    median = col.median()
+    Q3 = col.quantile(0.75)
+    IQR = Q3 - Q1
+    
+    return numObj, minValue, maxValue, mean, stdev, Q1, median, Q3, IQR
+
+
+
+
+
+import unittest
+
+class TestKnn(unittest.TestCase):
+    def setUp(self):
+        self.loc = "data/dataset.csv"
+        file = open('data/testing', 'rb')
+        self.data = pickle.load(file)
+        file.close()
+        
+    def test0(self):
+        """
+        Test the label counter 
+        """
+        self.column = self.data[0]
+        result = calculate(self.loc,self.column)
+        self.assertEqual(result[0],self.data[1][0])
+        self.assertAlmostEqual(result[1],self.data[1][1], places = 3)
+        self.assertAlmostEqual(result[2],self.data[1][2], places = 3)
+        self.assertAlmostEqual(result[3],self.data[1][3], places = 3)
+        self.assertAlmostEqual(result[4],self.data[1][4], places = 3)
+        self.assertAlmostEqual(result[5],self.data[1][5], places = 3)
+        self.assertAlmostEqual(result[6],self.data[1][6], places = 3)
+        self.assertAlmostEqual(result[7],self.data[1][7], places = 3)
+        self.assertAlmostEqual(result[8],self.data[1][8], places = 3)
+   
+tests = TestKnn()
+tests_to_run = unittest.TestLoader().loadTestsFromModule(tests)
+unittest.TextTestRunner().run(tests_to_run)
+
+#PROBLEM 2
+
+
+# Scatter plot of columns with attributes CO on x-axis and AFDP on y-axis
+# Return the x values, y values, title, x-label and the y-label
+# The dataset is available in "./data/dataset.csv"
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+def func():
+    
+    '''
+        Output: x, y, title, x-label, y-label
+    '''
+    x = []
+    y = []
+    title = ''
+    x_label = ''
+    y_label = ''
+    
+    # your code here
+    dataset = pd.read_csv("./data/dataset.csv")
+
+    # Extract the CO and AFDP columns
+    x = dataset['CO']
+    y = dataset['AFDP']
+
+    # Set the title and axis labels
+    title = 'Scatter Plot of CO vs. AFDP'
+    x_label = 'CO'
+    y_label = 'AFDP'
+
+    return x, y, title, x_label, y_label
+
+
+
+
+# Testing the func() function
+x, y, title, x_label, y_label = func()
+plt.scatter(x, y)
+plt.title(title)
+plt.xlabel(x_label)
+plt.ylabel(y_label)
+
+
+
